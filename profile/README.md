@@ -54,3 +54,8 @@ Apache 2.0. We build in the open because this kind of infrastructure should be s
 ### Status
 
 We're in the experimental phase — actively building toward complete, production-ready products. The architecture is proven, the demos work end-to-end, and the core services are deployed. What's ahead is hardening, extracting modules, and closing the gaps for real-world adoption. Early adopters and contributors welcome.
+
+### Contact
+
+- tgarciai@underpassai.com
+- contact@underpassai.com
