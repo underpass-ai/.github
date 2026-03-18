@@ -57,7 +57,7 @@ We're in the experimental phase — actively building toward complete, productio
 
 ### People
 
-Created by [Tirso Garcia](https://github.com/tgarciai)
+Created by [Tirso Garcia](https://github.com/tgarciai) · [LinkedIn](https://linkedin.com/in/tgarciai)
 
 ### Contact
 
