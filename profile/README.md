@@ -1,14 +1,14 @@
 ## Underpass AI
 
-**We don't build models. We engineer the infrastructure that makes them actually work.**
+**We don't build models. We engineer the infrastructure that makes them useful.**
 
-While the industry races toward 128K context windows and ever-larger models, we go the opposite direction: surgical context, governed execution, and statistical tool selection. A 7B model with the right context outperforms a frontier model drowning in noise.
+We focus on surgical context, governed execution, and statistical tool selection. Our benchmark data shows that structured explanatory context narrows the accuracy gap between local and frontier models — an 8B model with well-structured context scores comparably to frontier models on task identification, restart-point selection, and rationale preservation in synthetic evaluation graphs.
 
-We use Claude, OpenAI, Qwen, or whatever model fits the job. We're not competing with the giants — we're building the engineering layer that squeezes every drop of value out of them.
+We use Claude, OpenAI, Qwen, or whatever model fits the job. We're not competing with model providers — we're building the engineering layer that helps extract more value from any model.
 
 ### What we build
 
-**Context rehydration** — A knowledge graph holds the full picture. When an event fires, the Rehydration Kernel traverses only what matters for that agent's role, renders token-counted sections, and delivers a surgical bundle. Typed explanatory relationships preserve why each node exists — rationale, motivation, method, and decision linkage — so agents can diagnose failures, resume interrupted work, and justify decisions from rehydrated context alone. Fewer tokens, better reasoning.
+**Context rehydration** — A knowledge graph holds the full picture. When an event fires, the Rehydration Kernel traverses only what matters for that agent's role, renders token-counted sections, and delivers a bounded bundle. Typed explanatory relationships preserve why each node exists — rationale, motivation, method, and decision linkage — so agents can diagnose failures, resume interrupted work, and justify decisions from rehydrated context alone. Fewer tokens, better signal.
 
 **Governed tool execution** — Agents don't run loose. The Underpass Runtime provides isolated workspaces with 96+ tools under policy enforcement. Every invocation is tracked, audited, and produces telemetry that feeds back into the system.
 
@@ -24,11 +24,11 @@ NATS event → specific agent activates → kernel delivers surgical context →
     telemetry feeds back → policies improve → next event, better decisions
 ```
 
-Each agent is a specialist: one for diagnostics, another for repairs, another for strategic decisions. Small models handle most of the work on local GPU at zero cost. When a task exceeds their capability, the system escalates to Claude or GPT — one strategic call with surgical tokens, not a sprawling prompt.
+Each agent is a specialist: one for diagnostics, another for repairs, another for strategic decisions. Local models handle routine work on GPU. When a task requires stronger reasoning, the system can escalate to frontier APIs — with bounded context, not sprawling prompts.
 
 ### Model-agnostic
 
-The platform doesn't care what reasons. Claude, OpenAI, open-weight models via vLLM — swap the model, keep the infrastructure. The value isn't in the model. It's in the engineering around it.
+The platform doesn't care what reasons. Claude, OpenAI, open-weight models via vLLM — swap the model, keep the infrastructure. The value is in context quality and execution governance, not in any specific model.
 
 ### Repositories
 
@@ -53,7 +53,7 @@ Apache 2.0. We build in the open because this kind of infrastructure should be s
 
 ### Status
 
-We're in the experimental phase — actively building toward complete, production-ready products. The architecture is proven, the demos work end-to-end, and the core services are deployed. What's ahead is hardening, extracting modules, and closing the gaps for real-world adoption. Early adopters and contributors welcome.
+We're in the experimental phase — actively building toward production-ready products. The core services are deployed and the end-to-end demos work. Benchmark results on synthetic graphs are documented in the kernel repo. What's ahead is hardening, broader evaluation, and real-world adoption. Early adopters and contributors welcome.
 
 ### People
 
