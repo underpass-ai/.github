@@ -10,7 +10,7 @@ We use Claude, OpenAI, Qwen, or whatever model fits the job. We're not competing
 
 **Context rehydration** — A knowledge graph holds the full picture. When an event fires, the Rehydration Kernel traverses only what matters for that agent's role, renders token-counted sections, and delivers a bounded bundle. Typed explanatory relationships preserve why each node exists — rationale, motivation, method, and decision linkage — so agents can diagnose failures, resume interrupted work, and justify decisions from rehydrated context alone. Fewer tokens, better signal.
 
-**Governed tool execution** — Agents don't run loose. The Underpass Runtime provides isolated workspaces with 96+ tools under policy enforcement. Every invocation is tracked, audited, and produces telemetry that feeds back into the system.
+**Governed tool execution** — Agents don't run loose. The Underpass Runtime provides isolated workspaces with 99 governed tools across 23 families — filesystem, git, build, test, security, containers, Kubernetes, messaging, data — all under policy enforcement with full telemetry. Every invocation is tracked, audited, and produces telemetry that feeds the learning loop. OpenAPI 3.1 and AsyncAPI 3.0 contracts define the API surface.
 
 **Statistical tool selection** — No LLM call needed to pick the right tool. Thompson Sampling ranks tools by empirical success rate per context, with hard SLO constraints on latency, error rate, and cost. The telemetry loop closes itself — tools that fail get ranked down, tools that work get ranked up.
 
@@ -32,13 +32,22 @@ The platform doesn't care what reasons. Claude, OpenAI, open-weight models via v
 
 ### Repositories
 
-| Layer | Repository | What it does |
-|-------|-----------|-------------|
-| **Product** | [`swe-ai-fleet`](https://github.com/underpass-ai/swe-ai-fleet) | Multi-agent SWE platform — planning, deliberation, and execution |
-| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Isolated workspaces, 96+ governed tools, telemetry, tool-learning pipeline |
-| **Context** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Graph-native context rehydration with explanatory relationships — bounded retrieval across pull and event-driven runtimes |
+| Layer | Repository | Language | What it does |
+|-------|-----------|----------|-------------|
+| **Product** | [`swe-ai-fleet`](https://github.com/underpass-ai/swe-ai-fleet) | Python | Multi-agent SWE platform — planning, deliberation, and execution |
+| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | 99 governed tools, isolated workspaces, TLS across 5 transports, Thompson Sampling pipeline, Helm chart with mTLS |
+| **Context** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Graph-native context rehydration with explanatory relationships — 270 unit tests, 9 integration tests, LLM-as-judge benchmark (432 evaluations) |
 
-As the platform matures, we extract focused modules from the runtime and kernel — each independently deployable, each solving one problem well.
+### Production-grade infrastructure
+
+Both core services have been through comprehensive quality audits:
+
+- **Security**: Threat models, trust boundary diagrams, TLS 1.3 on all transports, policy engine with RBAC, audit logging with secret redaction, CodeQL + govulncheck + SonarCloud in CI
+- **Operations**: Helm charts with dev/production/mTLS value overrides, HPA, PDB, NetworkPolicy, PrometheusRule with 6 alerts, operational runbooks
+- **Testing**: 80% coverage gates, 14 E2E tests as K8s Jobs (smoke/core/full tiers), table-driven unit tests with hand-written fakes
+- **API contracts**: OpenAPI 3.1 (HTTP), AsyncAPI 3.0 (NATS events), contract validation in CI
+- **Observability**: Domain-layer quality metrics as value objects, Prometheus exposition, OTel tracing, structured logging
+- **CI/CD**: Automated dependency updates (Dependabot), release automation (tag-triggered builds + GHCR push), quality gate scripts
 
 ### Demos
 
@@ -47,13 +56,17 @@ As the platform matures, we extract focused modules from the runtime and kernel 
 | [`underpass-demo`](https://github.com/underpass-ai/underpass-demo) | Runtime + tool-learning in action (Thompson Sampling, cost benchmarks) |
 | [`rehydration-starship-demo`](https://github.com/underpass-ai/rehydration-starship-demo) | Context rehydration + event-driven agents + model routing |
 
+### Architecture decisions
+
+Both services maintain Architecture Decision Records (ADRs) documenting key design choices with explicit trade-offs and alternatives considered. Security models with threat analysis are published in each repository.
+
 ### Open source
 
 Apache 2.0. We build in the open because this kind of infrastructure should be shared, challenged, and improved by the community. Fork it, break it, make it better.
 
 ### Status
 
-We're in the experimental phase — actively building toward production-ready products. The core services are deployed and the end-to-end demos work. Benchmark results on synthetic graphs are documented in the kernel repo. What's ahead is hardening, broader evaluation, and real-world adoption. Early adopters and contributors welcome.
+The core services are deployed and validated through end-to-end tests on live Kubernetes clusters with full TLS. Benchmark results on synthetic graphs are documented in the kernel repo. We're actively hardening for production adoption. Early adopters and contributors welcome.
 
 ### People
 
