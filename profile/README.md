@@ -43,6 +43,10 @@ Both core services have been through comprehensive quality audits:
 - **API contracts**: gRPC (proto), OpenAPI 3.1, AsyncAPI 3.0, contract validation in CI
 - **CI/CD**: Automated image builds on merge (runtime, e2e-runner, cert-gen, tool-learning), tag-triggered releases, GHCR push, quality gates
 
+### Laboratory
+
+New capabilities — algorithms, agent architectures, ceremony protocols — are designed, prototyped, and validated internally before shipping to the public repositories. If you're interested in early access or collaboration, reach out.
+
 ### Demos
 
 | Repository | What it shows |
