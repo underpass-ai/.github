@@ -2,77 +2,67 @@
 
 **We don't build models. We engineer the infrastructure that makes them useful.**
 
-We focus on surgical context, governed execution, and statistical tool selection. Our benchmark data shows that structured explanatory context narrows the accuracy gap between local and frontier models — an 8B model with well-structured context scores comparably to frontier models on task identification, restart-point selection, and rationale preservation in synthetic evaluation graphs.
+We focus on surgical context, governed execution, and adaptive tool selection. Our benchmark data shows that structured explanatory context narrows the accuracy gap between local and frontier models — an 8B model with well-structured context scores comparably to frontier models on task identification, restart-point selection, and rationale preservation.
 
-We use Claude, OpenAI, Qwen, or whatever model fits the job. We're not competing with model providers — we're building the engineering layer that helps extract more value from any model.
+We use Claude, OpenAI, Qwen, or whatever model fits the job. We're not competing with model providers — we're building the engineering layer that extracts more value from any model.
 
 ### What we build
 
-**Context rehydration** — A knowledge graph holds the full picture. When an event fires, the Rehydration Kernel traverses only what matters for that agent's role, renders token-counted sections, and delivers a bounded bundle. Typed explanatory relationships preserve why each node exists — rationale, motivation, method, and decision linkage — so agents can diagnose failures, resume interrupted work, and justify decisions from rehydrated context alone. Fewer tokens, better signal.
+**Context rehydration** — A knowledge graph holds the full picture. When an event fires, the Rehydration Kernel traverses only what matters for that agent's role, renders token-counted sections, and delivers a bounded bundle. Typed explanatory relationships preserve why each node exists — rationale, motivation, method, and decision linkage — so agents can diagnose failures, resume interrupted work, and justify decisions from rehydrated context alone.
 
-**Governed tool execution** — Agents don't run loose. The Underpass Runtime provides isolated workspaces with 99 governed tools across 23 families — filesystem, git, build, test, security, containers, Kubernetes, messaging, data — all under policy enforcement with full telemetry. Every invocation is tracked, audited, and produces telemetry that feeds the learning loop. OpenAPI 3.1 and AsyncAPI 3.0 contracts define the API surface.
+**Governed tool execution** — Agents don't run loose. The Underpass Runtime provides isolated workspaces with 99 governed tools across 23 families — filesystem, git, build, test, security, containers, Kubernetes, messaging, data — all under policy enforcement with full telemetry.
 
-**Statistical tool selection** — No LLM call needed to pick the right tool. Thompson Sampling ranks tools by empirical success rate per context, with hard SLO constraints on latency, error rate, and cost. The telemetry loop closes itself — tools that fail get ranked down, tools that work get ranked up.
+**Adaptive tool selection** — No LLM call needed to pick the right tool. A 4-tier algorithm stack (heuristic, telemetry, Thompson Sampling, Neural Thompson Sampling) ranks tools by empirical success rate per context, with hard SLO constraints on latency, error rate, and cost. The telemetry loop closes itself — tools that fail get ranked down, tools that work get ranked up.
 
 ### Event-driven agents
 
 When something happens, the right agent fires. No polling. No central orchestrator.
 
 ```
-NATS event → specific agent activates → kernel delivers surgical context →
-  Thompson Sampling selects best tools → runtime executes governed →
+NATS event → agent activates → kernel delivers surgical context →
+  adaptive scorer selects tools → runtime executes governed →
     telemetry feeds back → policies improve → next event, better decisions
 ```
 
-Each agent is a specialist: one for diagnostics, another for repairs, another for strategic decisions. Local models handle routine work on GPU. When a task requires stronger reasoning, the system can escalate to frontier APIs — with bounded context, not sprawling prompts.
-
-### Model-agnostic
-
-The platform doesn't care what reasons. Claude, OpenAI, open-weight models via vLLM — swap the model, keep the infrastructure. The value is in context quality and execution governance, not in any specific model.
+Each agent is a specialist. Local models handle routine work. When a task requires stronger reasoning, the system escalates to frontier APIs — with bounded context, not sprawling prompts.
 
 ### Repositories
 
 | Layer | Repository | Language | What it does |
 |-------|-----------|----------|-------------|
-| **Product** | [`swe-ai-fleet`](https://github.com/underpass-ai/swe-ai-fleet) | Python | Multi-agent SWE platform — planning, deliberation, and execution |
-| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | 99 governed tools, isolated workspaces, TLS across 5 transports, Thompson Sampling pipeline, Helm chart with mTLS |
+| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | 99 governed tools, isolated workspaces, 4-tier adaptive recommendations, NeuralTS, mTLS, Helm chart, 15 E2E tests |
 | **Context** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Graph-native context rehydration with explanatory relationships — 270 unit tests, 9 integration tests, LLM-as-judge benchmark (432 evaluations) |
 
 ### Production-grade infrastructure
 
 Both core services have been through comprehensive quality audits:
 
-- **Security**: Threat models, trust boundary diagrams, TLS 1.3 on all transports, policy engine with RBAC, audit logging with secret redaction, CodeQL + govulncheck + SonarCloud in CI
-- **Operations**: Helm charts with dev/production/mTLS value overrides, HPA, PDB, NetworkPolicy, PrometheusRule with 6 alerts, operational runbooks
-- **Testing**: 80% coverage gates, 14 E2E tests as K8s Jobs (smoke/core/full tiers), table-driven unit tests with hand-written fakes
-- **API contracts**: OpenAPI 3.1 (HTTP), AsyncAPI 3.0 (NATS events), contract validation in CI
-- **Observability**: Domain-layer quality metrics as value objects, Prometheus exposition, OTel tracing, structured logging
-- **CI/CD**: Automated dependency updates (Dependabot), release automation (tag-triggered builds + GHCR push), quality gate scripts
+- **Security**: Threat models, trust boundary diagrams, TLS 1.3 on all transports, policy engine with RBAC, audit logging, CodeQL + govulncheck + SonarCloud in CI
+- **Operations**: Helm charts with dev/production/mTLS value overrides, HPA, PDB, NetworkPolicy, PrometheusRule, operational runbooks
+- **Testing**: 80% coverage gates, 15 E2E tests as K8s Jobs via `helm test`, table-driven unit tests with hand-written fakes
+- **API contracts**: gRPC (proto), OpenAPI 3.1, AsyncAPI 3.0, contract validation in CI
+- **CI/CD**: Automated image builds on merge (runtime, e2e-runner, cert-gen, tool-learning), tag-triggered releases, GHCR push, quality gates
 
 ### Demos
 
 | Repository | What it shows |
 |-----------|--------------|
-| [`underpass-demo`](https://github.com/underpass-ai/underpass-demo) | Runtime + tool-learning in action (Thompson Sampling, cost benchmarks) |
-| [`rehydration-starship-demo`](https://github.com/underpass-ai/rehydration-starship-demo) | Context rehydration + event-driven agents + model routing |
-
-### Architecture decisions
-
-Both services maintain Architecture Decision Records (ADRs) documenting key design choices with explicit trade-offs and alternatives considered. Security models with threat analysis are published in each repository.
-
-### Open source
-
-Apache 2.0. We build in the open because this kind of infrastructure should be shared, challenged, and improved by the community. Fork it, break it, make it better.
+| [`underpass-demo`](https://github.com/underpass-ai/underpass-demo) | Runtime + tool-learning in action |
 
 ### Status
 
-The core services are deployed and validated through end-to-end tests on live Kubernetes clusters with full TLS. Benchmark results on synthetic graphs are documented in the kernel repo. We're actively hardening for production adoption. Early adopters and contributors welcome.
+The core services are deployed and validated through end-to-end tests on live Kubernetes clusters with full mTLS. The adaptive recommendation engine runs a closed learning loop: telemetry feeds Thompson Sampling and Neural Thompson Sampling scorers in production.
 
-### People
+### Ownership
 
-Created by [Tirso Garcia](https://github.com/tgarciai) · [LinkedIn](https://www.linkedin.com/in/tirsogarcia/)
+Underpass AI is a project created by Tirso García Ibáñez.
+
+Public repositories are released under Apache-2.0.
+Where present, LICENSE and NOTICE files define redistribution and attribution requirements.
 
 ### Contact
+
+Created by [Tirso García Ibáñez](https://github.com/tgarciai) · [LinkedIn](https://www.linkedin.com/in/tirsogarcia/)
 
 - tgarciai@underpassai.com
 - contact@underpassai.com
