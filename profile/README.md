@@ -85,14 +85,14 @@ Core infrastructure deployed and validated on live Kubernetes clusters with full
 
 ### Ownership
 
-Underpass AI is a project created by Tirso Garcia Ibanez.
+Underpass AI is a project created by Tirso García Ibáñez.
 
 Public repositories are released under Apache-2.0.
 Where present, LICENSE and NOTICE files define redistribution and attribution requirements.
 
 ### Contact
 
-Created by [Tirso Garcia Ibanez](https://github.com/tgarciai) · [LinkedIn](https://www.linkedin.com/in/tirsogarcia/)
+Created by [Tirso García Ibáñez](https://github.com/tgarciai) · [LinkedIn](https://www.linkedin.com/in/tirsogarcia/)
 
 - tgarciai@underpassai.com
 - contact@underpassai.com
