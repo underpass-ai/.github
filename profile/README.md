@@ -80,7 +80,7 @@ The kernel's value grows with every resolved incident. The first resolution is s
 
 ### Currently building
 
-**Autonomous incident resolution** — applying Runtime + Kernel to a system where specialist agents autonomously detect, investigate, and resolve production incidents. Event-driven orchestration, governed execution, and institutional memory from past resolutions.
+**Autonomous incident resolution** — applying [Runtime](https://github.com/underpass-ai/underpass-runtime) + [Kernel](https://github.com/underpass-ai/rehydration-kernel) to a system where specialist agents autonomously detect, investigate, and resolve production incidents. Event-driven orchestration, governed execution, and institutional memory from past resolutions.
 
 ### Status
 
