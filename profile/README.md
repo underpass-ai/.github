@@ -78,6 +78,10 @@ The common pattern: **domain event triggers specialist agents → kernel provide
 
 The kernel's value grows with every resolved incident. The first resolution is slow — agents investigate from first principles. The tenth is fast and confident — the kernel has real context from nine previous investigations. **Switching away from Underpass means losing accumulated institutional knowledge.** This is the moat.
 
+### Currently building
+
+**Autonomous incident resolution** — applying Runtime + Kernel to a system where specialist agents autonomously detect, investigate, and resolve production incidents. Event-driven orchestration, governed execution, and institutional memory from past resolutions.
+
 ### Status
 
 Core infrastructure deployed and validated on live Kubernetes clusters with full mTLS. The production incident demo runs end-to-end: real Grafana alert fires → agents investigate real code → agents deploy fix through real CI/CD → service recovers → alert resolves. Agent coordination and multi-domain support in active development.
