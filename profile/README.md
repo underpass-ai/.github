@@ -65,7 +65,7 @@ The common pattern: **domain event triggers specialist agents → kernel provide
 | Plane | Repository | Language | What it provides |
 |-------|-----------|----------|-----------------|
 | **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | 123 governed tools, K8s workspaces, adaptive recommendations (Heuristic → Thompson → NeuralTS), tool.suggest, policy.check, mTLS, 17 E2E tests |
-| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Knowledge graph rehydration, explanatory relationships, 270 unit tests, 4 E2E Helm tests |
+| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Knowledge graph rehydration, explanatory relationships, 387 unit tests, 4 E2E test suites |
 
 ### Production-grade infrastructure
 
