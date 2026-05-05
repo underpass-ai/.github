@@ -6,7 +6,7 @@ We don't build models. We build the two planes that make them operationally usef
 
 ### What we build
 
-**Memory plane** — The [Rehydration Kernel](https://github.com/underpass-ai/rehydration-kernel) holds a knowledge graph of decisions, incidents, and operational history. When an event fires, it delivers only what the agent needs for its role. Typed explanatory relationships preserve *why* each piece of context exists. Each resolved incident becomes legitimate context for the next — the kernel accumulates institutional knowledge the way a senior engineer accumulates experience.
+**Memory plane** — The [Rehydration Kernel](https://github.com/underpass-ai/rehydration-kernel) holds a knowledge graph of decisions, incidents, evidence, and operational history. It exposes an API-first gRPC boundary for deterministic memory ingest, retrieval, temporal traversal, trace, and inspect. Memory is scoped by **abouts** and **dimensions**, so the same incident can be navigated through agent, session, timeline, evidence, or cross-incident views without prompt-only reconstruction. Typed explanatory relationships preserve *why* each piece of context exists. Each resolved incident becomes legitimate context for the next — the kernel accumulates institutional knowledge the way a senior engineer accumulates experience.
 
 **Execution plane** — The [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime) provides isolated workspaces with 123 governed tools across 30 families. Every invocation is policy-checked, telemetry-recorded, and feeds a learning loop. A 4-tier recommendation engine (heuristic → Thompson Sampling → Neural Thompson Sampling) learns which tools work best for each context.
 
@@ -19,7 +19,7 @@ Underpass is deployed alongside a client's existing infrastructure. The client's
 ```
 Client infrastructure produces domain event (alert, deviation, deadline)
   → Specialist agent investigates the real system (code, metrics, data)
-    → Kernel provides historical context from past resolutions
+    → Kernel restores scoped historical context and navigable timelines
       → Agent acts via governed runtime tools (patch, test, deploy, report)
         → Evidence recorded → Policies improve → Kernel enriched
           → Next similar event: faster, more confident resolution
@@ -65,14 +65,14 @@ The common pattern: **domain event triggers specialist agents → kernel provide
 | Plane | Repository | Language | What it provides |
 |-------|-----------|----------|-----------------|
 | **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | 123 governed tools, K8s workspaces, adaptive recommendations (Heuristic → Thompson → NeuralTS), tool.suggest, policy.check, mTLS, 17 E2E tests |
-| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Knowledge graph rehydration, explanatory relationships, 387 unit tests, 4 E2E test suites |
+| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | API-first `KernelMemoryService` gRPC surface, deterministic context retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP live adapter, Helm and public-ingress E2E coverage |
 
 ### Production-grade infrastructure
 
 - **Security**: TLS 1.3 on all transports, policy engine with RBAC, CodeQL + SonarCloud
-- **Testing**: 80% coverage gates, 17 E2E tests via K8s Jobs, fail-fast, no fallbacks
+- **Testing**: 80% coverage gates, live Kubernetes E2E tests, Helm tests, fail-fast contracts, no fallbacks
 - **CI/CD**: Automated image builds on merge, all images share Chart.appVersion
-- **Observability**: Domain quality metrics, OTel tracing, structured logging
+- **Observability**: Domain quality metrics, OTel tracing, structured gRPC request/response logging
 
 ### The compound value thesis
 
@@ -80,11 +80,13 @@ The kernel's value grows with every resolved incident. The first resolution is s
 
 ### Currently building
 
-**Autonomous incident resolution** — applying [Runtime](https://github.com/underpass-ai/underpass-runtime) + [Kernel](https://github.com/underpass-ai/rehydration-kernel) to a system where specialist agents autonomously detect, investigate, and resolve production incidents. Event-driven orchestration, governed execution, and institutional memory from past resolutions.
+**Autonomous incident resolution and replayable operational memory** — applying [Runtime](https://github.com/underpass-ai/underpass-runtime) + [Kernel](https://github.com/underpass-ai/rehydration-kernel) to systems where specialist agents autonomously detect, investigate, and resolve production incidents. Event-driven orchestration, governed execution, and institutional memory from past resolutions are exposed as a navigable process: what happened, what each agent knew, where the path forked, what evidence mattered, and why the final resolution worked.
 
 ### Status
 
-Core infrastructure deployed and validated on live Kubernetes clusters with full mTLS. The production incident demo runs end-to-end: real Grafana alert fires → agents investigate real code → agents deploy fix through real CI/CD → service recovers → alert resolves. Agent coordination and multi-domain support in active development.
+Core infrastructure is deployed and validated on live Kubernetes clusters with full mTLS. The production incident demo runs end-to-end: real Grafana alert fires → agents investigate real code → agents deploy fix through real CI/CD → service recovers → alert resolves.
+
+The Rehydration Kernel now includes a typed `KernelMemoryService` gRPC API for memory ingest, deterministic `Wake`/`Ask`, temporal navigation (`Goto`, `Near`, `Rewind`, `Forward`), graph path tracing, and node inspection. Memory dimensions are namespaced by about, scoped explicitly, and can intentionally traverse multiple abouts when requested. The MCP integration consumes the same public API instead of private adapter paths.
 
 ### Ownership
 
