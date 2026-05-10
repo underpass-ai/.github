@@ -1,103 +1,147 @@
 ## Underpass AI
 
-**The memory and execution layer for operational AI systems.**
+**Memory and execution infrastructure for reliable AI agents.**
 
-We don't build models. We build the two planes that make them operationally useful: a memory plane that restores exactly the right context, and an execution plane that governs every action.
+Underpass AI builds the infrastructure layer around models: a memory plane that
+agents can navigate and audit, and an execution plane that governs how agents
+act on real systems.
 
-### What we build
+We do not build foundation models. We build the operational substrate that
+makes them safer, more useful, and easier to inspect in production.
 
-**Memory plane** — The [Rehydration Kernel](https://github.com/underpass-ai/rehydration-kernel) holds a knowledge graph of decisions, incidents, evidence, and operational history. It exposes an API-first gRPC boundary for deterministic memory ingest, retrieval, temporal traversal, trace, and inspect. Memory is scoped by **abouts** and **dimensions**, so the same incident can be navigated through agent, session, timeline, evidence, or cross-incident views without prompt-only reconstruction. Typed explanatory relationships preserve *why* each piece of context exists. Each resolved incident becomes legitimate context for the next — the kernel accumulates institutional knowledge the way a senior engineer accumulates experience.
+### What We Build
 
-**Execution plane** — The [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime) provides isolated workspaces with 123 governed tools across 30 families. Every invocation is policy-checked, telemetry-recorded, and feeds a learning loop. A 4-tier recommendation engine (heuristic → Thompson Sampling → Neural Thompson Sampling) learns which tools work best for each context.
+**Memory plane** — [Underpass KMP](https://github.com/underpass-ai/rehydration-kernel)
+is a Kernel Memory Protocol for temporal, multidimensional, auditable agent
+memory. It exposes an API-first `KernelMemoryService` gRPC boundary for memory
+ingest, deterministic `Wake`/`Ask`, temporal traversal, graph path tracing, and
+node inspection. Memory is scoped by `about`, split into dimensions, connected
+by explicit relationships, and backed by evidence and provenance.
 
-Together they form **infrastructure, not an application**. Any domain that needs institutional memory plus governed action can be built on top.
+**Execution plane** — [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime)
+provides isolated workspaces, governed tool execution, policy checks,
+telemetry, and adaptive tool recommendations for tool-driven agents.
 
-### How it works
+Together they form **infrastructure, not an application**. Any domain that
+needs institutional memory plus governed action can be built on top.
 
-Underpass is deployed alongside a client's existing infrastructure. The client's systems (observability, CI/CD, ERPs, operational platforms) produce **domain events** following an AsyncAPI contract. Underpass agents consume these events, investigate real systems, and act through governed workflows.
+### How It Works
 
+Underpass is designed to run alongside existing infrastructure. Operational
+systems produce domain events. Specialist agents investigate real systems,
+recover relevant memory through KMP, act through governed runtime tools, and
+record evidence back into memory.
+
+```text
+Domain event fires
+  -> Specialist agent investigates the real system
+    -> KMP restores scoped memory and navigable timelines
+      -> Runtime governs tool execution
+        -> Evidence is recorded
+          -> The next similar event starts with better memory
 ```
-Client infrastructure produces domain event (alert, deviation, deadline)
-  → Specialist agent investigates the real system (code, metrics, data)
-    → Kernel restores scoped historical context and navigable timelines
-      → Agent acts via governed runtime tools (patch, test, deploy, report)
-        → Evidence recorded → Policies improve → Kernel enriched
-          → Next similar event: faster, more confident resolution
+
+The common pattern:
+
+```text
+domain event -> agent -> memory -> governed action -> evidence -> better memory
 ```
 
-Each agent is a specialist with a defined purpose, autonomy boundary, and success criteria. Local models (Qwen 9B) handle routine work. Frontier models (Claude) only appear where reasoning quality justifies cost.
+### Why It Matters
 
-### Use cases
+Reliable agents need memory they can navigate, not just context they can
+retrieve.
 
-Kernel + Runtime are **domain-agnostic**. Any workflow that requires agents acting on real systems with institutional memory and auditable execution:
+For real agentic work, it is not enough to ask which text chunk looks similar.
+The system also needs to answer:
 
-**Software engineering**
-- Production incident resolution — alert to deployment to recovery confirmation
-- Security vulnerability remediation — CVE triage across services
-- Codebase migration — framework upgrades with accumulated patterns
-- Infrastructure drift detection and correction
+- what was known at a given moment;
+- which attempt failed;
+- what changed later;
+- which agent introduced a wrong assumption;
+- why one answer replaced another;
+- which evidence supports the final result.
 
-**Beyond software**
-- Supply chain disruption response — sourcing, logistics, negotiation
-- Clinical trial protocol deviations — classification, CAPA, regulatory filing
-- Financial regulatory reporting — extraction, reconciliation, submission
-- Legal contract analysis — risk scoring, precedent search, redlining
-- Manufacturing quality control — sensor correlation, containment, 8D reports
-- Insurance claims processing — verification, fraud detection, adjudication
-- Energy grid anomaly response — real-time load balancing, protection
-- Talent acquisition optimization — bottleneck analysis, process intervention
-
-The common pattern: **domain event triggers specialist agents → kernel provides institutional memory → runtime governs execution → each resolution enriches the next**.
-
-### Architecture: what's ours, what's the client's
-
-| Component | Ownership | Examples |
-|-----------|-----------|---------|
-| **Kernel + Runtime** | Underpass | Memory graph, governed tools, agent fleet |
-| **AsyncAPI contract** | Underpass (spec) | Event schema the client must conform to |
-| **Integration adapter** | Client (implementation) | Alert relay, CI/CD hooks, ERP connectors |
-| **Application services** | Client | payments-api, order-svc, etc. |
-| **Observability** | Client | Prometheus, Grafana, PagerDuty, Datadog |
-| **CI/CD** | Client | GitHub Actions, Jenkins, ArgoCD |
+Underpass KMP is built around that model: memory as a temporal, inspectable,
+multidimensional graph, not just raw transcript replay or vector search over
+chunks.
 
 ### Repositories
 
 | Plane | Repository | Language | What it provides |
-|-------|-----------|----------|-----------------|
-| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | 123 governed tools, K8s workspaces, adaptive recommendations (Heuristic → Thompson → NeuralTS), tool.suggest, policy.check, mTLS, 17 E2E tests |
-| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | API-first `KernelMemoryService` gRPC surface, deterministic context retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP live adapter, Helm and public-ingress E2E coverage |
+| --- | --- | --- | --- |
+| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Underpass KMP: typed `KernelMemoryService`, deterministic memory retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP adapter, Helm/Kubernetes deployment |
+| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | Isolated workspaces, governed tools, policy checks, adaptive tool recommendation, telemetry, mTLS, Kubernetes-oriented execution |
 
-### Production-grade infrastructure
+The `rehydration-*` names are historical repository and artifact names. The
+public memory product name is **Underpass KMP**.
 
-- **Security**: TLS 1.3 on all transports, policy engine with RBAC, CodeQL + SonarCloud
-- **Testing**: 80% coverage gates, live Kubernetes E2E tests, Helm tests, fail-fast contracts, no fallbacks
-- **CI/CD**: Automated image builds on merge, all images share Chart.appVersion
-- **Observability**: Domain quality metrics, OTel tracing, structured gRPC request/response logging
+### Architecture: What We Own
 
-### The compound value thesis
+| Component | Ownership | Examples |
+| --- | --- | --- |
+| **Underpass KMP** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model |
+| **Underpass Runtime** | Underpass | Governed tools, execution isolation, policy checks |
+| **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
+| **Application services** | Product/team using Underpass | payments-api, order-svc, internal platforms |
+| **Observability and CI/CD** | Product/team using Underpass | Prometheus, Grafana, PagerDuty, GitHub Actions, ArgoCD |
 
-The kernel's value grows with every resolved incident. The first resolution is slow — agents investigate from first principles. The tenth is fast and confident — the kernel has real context from nine previous investigations. **Switching away from Underpass means losing accumulated institutional knowledge.** This is the moat.
+### Production-Oriented Foundations
 
-### Currently building
+- **API first**: KMP behavior is defined by typed gRPC and domain contracts;
+  MCP is an agent-facing adapter over the same memory semantics.
+- **Explicit scope**: memory reads are scoped by current `about`, selected
+  abouts, or intentionally global reads.
+- **Temporal traversal**: callers can move through memory with `goto`, `near`,
+  `rewind`, `forward`, `trace`, and `inspect`.
+- **Evidence and provenance**: recovered memory carries refs, proof, relation
+  metadata, and traceability.
+- **Fail-fast behavior**: invalid scopes and unsafe fallbacks are rejected
+  instead of silently widening a query.
+- **Observability**: structured logs, metrics, traces, and relation-quality
+  signals make memory behavior auditable.
+- **Infrastructure boundaries**: TLS/mTLS, Kubernetes deployment, Helm tests,
+  and adapter-based persistence roles.
 
-**Autonomous incident resolution and replayable operational memory** — applying [Runtime](https://github.com/underpass-ai/underpass-runtime) + [Kernel](https://github.com/underpass-ai/rehydration-kernel) to systems where specialist agents autonomously detect, investigate, and resolve production incidents. Event-driven orchestration, governed execution, and institutional memory from past resolutions are exposed as a navigable process: what happened, what each agent knew, where the path forked, what evidence mattered, and why the final resolution worked.
+### Currently Building
+
+**Replayable operational memory for AI agents** — a memory layer that lets
+people and LLMs inspect what happened, what each agent knew, where the process
+forked, which evidence mattered, and why the final resolution worked.
+
+Current focus areas:
+
+- stronger MemoryArena, MemoryAgentBench, and LongMemEval evaluations;
+- hybrid retrieval, reranking, and typed domain plugins;
+- visual graph and timeline exploration for traversing agent memory;
+- a small operator model trained to use KMP/MCP tools efficiently;
+- embedded and installable distributions that reduce infrastructure
+  requirements while preserving KMP semantics.
+
+### Articles
+
+- [Building Kernel Memory Protocol: Navigable Memory for AI Agents](https://dev.to/tirsogarcia/building-kernel-memory-protocol-navigable-memory-for-ai-agents-315j)
+- [Construyendo Kernel Memory Protocol: memoria navegable para agentes de IA](https://dev.to/tirsogarcia/construyendo-kernel-memory-protocol-memoria-navegable-para-agentes-de-ia-24lc)
 
 ### Status
 
-Core infrastructure is deployed and validated on live Kubernetes clusters with full mTLS. The production incident demo runs end-to-end: real Grafana alert fires → agents investigate real code → agents deploy fix through real CI/CD → service recovers → alert resolves.
+Core infrastructure is deployed and validated on live Kubernetes clusters with
+TLS/mTLS-enabled boundaries. Underpass KMP includes typed gRPC memory APIs,
+temporal traversal, graph tracing, node inspection, scoped multidimensional
+memory, and an MCP adapter over the same public API.
 
-The Rehydration Kernel now includes a typed `KernelMemoryService` gRPC API for memory ingest, deterministic `Wake`/`Ask`, temporal navigation (`Goto`, `Near`, `Rewind`, `Forward`), graph path tracing, and node inspection. Memory dimensions are namespaced by about, scoped explicitly, and can intentionally traverse multiple abouts when requested. The MCP integration consumes the same public API instead of private adapter paths.
+The project is active and evolving quickly. Public repositories are released
+under Apache-2.0 unless stated otherwise.
 
 ### Ownership
 
-Underpass AI is a project created by Tirso Garcia Ibañez.
-
-Public repositories are released under Apache-2.0.
-Where present, LICENSE and NOTICE files define redistribution and attribution requirements.
+Underpass AI is a project created by
+[Tirso Garcia Ibañez](https://github.com/tgarciai).
 
 ### Contact
 
-Created by [Tirso Garcia Ibañez](https://github.com/tgarciai) · [LinkedIn](https://www.linkedin.com/in/tirsogarcia/)
+[LinkedIn](https://www.linkedin.com/in/tirsogarcia/) ·
+[GitHub](https://github.com/tgarciai)
 
 - tgarciai@underpassai.com
 - contact@underpassai.com
