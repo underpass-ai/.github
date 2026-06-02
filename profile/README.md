@@ -4,14 +4,21 @@
 
 Website: [underpassai.com](https://underpassai.com)
 
-Underpass AI builds the infrastructure layer around models: a memory plane that
-agents can navigate and audit, and an execution plane that governs how agents
-act on real systems.
+Underpass AI builds the infrastructure layer around models: an orchestration
+plane that coordinates councils of specialist agents, a memory plane that agents
+can navigate and audit, and an execution plane that governs how agents act on
+real systems.
 
 We do not build foundation models. We build the operational substrate that
 makes them safer, more useful, and easier to inspect in production.
 
 ### What We Build
+
+**Orchestration plane** — [Underpass Choreographer](https://github.com/underpass-ai/underpass-choreographer)
+is an event-driven coordinator of specialist agent councils. It turns a domain
+event into a coordinated investigation, convening agents that recover memory
+through KMP and act through the runtime. It is use-case-agnostic,
+provider-agnostic, and API-first.
 
 **Memory plane** — [Underpass KMP](https://github.com/underpass-ai/rehydration-kernel)
 is a Kernel Memory Protocol for temporal, multidimensional, auditable agent
@@ -24,29 +31,30 @@ by explicit relationships, and backed by evidence and provenance.
 provides isolated workspaces, governed tool execution, policy checks,
 telemetry, and adaptive tool recommendations for tool-driven agents.
 
-Together they form **infrastructure, not an application**. Any domain that
+Together these three planes form **infrastructure, not an application**. Any domain that
 needs institutional memory plus governed action can be built on top.
 
 ### How It Works
 
 Underpass is designed to run alongside existing infrastructure. Operational
-systems produce domain events. Specialist agents investigate real systems,
-recover relevant memory through KMP, act through governed runtime tools, and
-record evidence back into memory.
+systems produce domain events. The choreographer convenes a council of
+specialist agents that investigate real systems, recover relevant memory through
+KMP, act through governed runtime tools, and record evidence back into memory.
 
 ```text
 Domain event fires
-  -> Specialist agent investigates the real system
-    -> KMP restores scoped memory and navigable timelines
-      -> Runtime governs tool execution
-        -> Evidence is recorded
-          -> The next similar event starts with better memory
+  -> Choreographer convenes a specialist agent council
+    -> Agents investigate the real system
+      -> KMP restores scoped memory and navigable timelines
+        -> Runtime governs tool execution
+          -> Evidence is recorded
+            -> The next similar event starts with better memory
 ```
 
 The common pattern:
 
 ```text
-domain event -> agent -> memory -> governed action -> evidence -> better memory
+domain event -> orchestration -> agent -> memory -> governed action -> evidence -> better memory
 ```
 
 ### Why It Matters
@@ -72,6 +80,7 @@ chunks.
 
 | Plane | Repository | Language | What it provides |
 | --- | --- | --- | --- |
+| **Orchestration** | [`underpass-choreographer`](https://github.com/underpass-ai/underpass-choreographer) | Rust | Event-driven coordination of specialist agent councils: turns domain events into coordinated investigations; use-case- and provider-agnostic; API-first |
 | **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Underpass KMP: typed `KernelMemoryService`, deterministic memory retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP adapter, Helm/Kubernetes deployment |
 | **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | Isolated workspaces, governed tools, policy checks, adaptive tool recommendation, telemetry, mTLS, Kubernetes-oriented execution |
 
@@ -82,6 +91,7 @@ public memory product name is **Underpass KMP**.
 
 | Component | Ownership | Examples |
 | --- | --- | --- |
+| **Underpass Choreographer** | Underpass | Agent-council orchestration, event-driven dispatch, escalation |
 | **Underpass KMP** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model |
 | **Underpass Runtime** | Underpass | Governed tools, execution isolation, policy checks |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
