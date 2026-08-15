@@ -14,26 +14,28 @@ makes them safer, more useful, and easier to inspect in production.
 
 ### What We Build
 
-**Coordination plane** — [Underpass Choreographer](https://github.com/underpass-ai/underpass-choreographer)
-is a deliberation engine for specialist agent councils. Agents propose,
-critique each other's proposals, revise, validate, and score — with an
-optional LLM-as-judge ranking proposals by intrinsic quality instead of
-arbitrary tie-breaks. Longer processes are declarative YAML *ceremonies*:
-states, steps, roles, and guarded transitions, with each step's winning
-contribution returned as a first-class API artifact. Every deliberation is
-auditable: the debate ships as OpenTelemetry trace events and is measured by
-deliberation-specific Prometheus metrics (winner-score distribution, judge
-discrimination, token cost). It is use-case-agnostic, provider-agnostic, and
-API-first.
+**Memory plane — Underpass KMP** — [Kernel Memory Protocol](https://github.com/underpass-ai/kmp)
+for temporal, multidimensional, auditable agent memory. Exposes an API-first
+`KernelMemoryService` gRPC boundary for memory ingest, deterministic `Wake`/`Ask`,
+temporal traversal, graph path tracing, and node inspection. Memory is scoped by
+`about`, split into dimensions, connected by explicit relationships, and backed by
+evidence and provenance.
 
-**Memory plane** — [Underpass KMP](https://github.com/underpass-ai/rehydration-kernel)
-is a Kernel Memory Protocol for temporal, multidimensional, auditable agent
-memory. It exposes an API-first `KernelMemoryService` gRPC boundary for memory
-ingest, deterministic `Wake`/`Ask`, temporal traversal, graph path tracing, and
-node inspection. Memory is scoped by `about`, split into dimensions, connected
-by explicit relationships, and backed by evidence and provenance.
+KMP ships in two distributions that share the same protocol semantics:
+- **Infrastructure** — typed gRPC server with Neo4j/Valkey/NATS adapters, Helm/Kubernetes
+deployment, full TLS/mTLS and observability. For teams running shared, auditable agent
+memory at scale.
+- **Local / embedded** — the kernel in-process inside an MCP stdio binary: zero
+infrastructure, per-project `.kernel/` memory, fsync-durable, verified live in
+**Claude Code** and **Codex**. Same KMP tools with identical JSON by construction.
 
-**Execution plane** — [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime)
+**Coordination plane — MADE by Underpass** — [Multi-Agent Deliberation Engine](https://github.com/underpass-ai/made)
+runs structured deliberations (propose → peer-critique → revise → validate → score → winner)
+and longer declarative YAML ceremonies as explicit state machines. Enforces output contracts,
+can score with an LLM judge, and ships observability that shows *why* an answer won.
+Domain- and provider-agnostic. Kubernetes-first.
+
+**Execution plane — [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime)**
 provides isolated workspaces, governed tool execution, policy checks,
 telemetry, and adaptive tool recommendations for tool-driven agents.
 
@@ -43,13 +45,13 @@ needs institutional memory plus governed action can be built on top.
 ### How It Works
 
 Underpass is designed to run alongside existing infrastructure. Operational
-systems produce domain events. The choreographer convenes a council of
-specialist agents that investigate real systems, recover relevant memory through
-KMP, act through governed runtime tools, and record evidence back into memory.
+systems produce domain events. MADE convenes a council of specialist agents that
+investigate real systems, recover relevant memory through KMP, act through governed
+runtime tools, and record evidence back into memory.
 
 ```text
 Domain event fires
-  -> Choreographer convenes a specialist agent council
+  -> MADE convenes a specialist agent council
     -> Agents investigate the real system
       -> KMP restores scoped memory and navigable timelines
         -> Runtime governs tool execution
@@ -65,8 +67,7 @@ domain event -> orchestration -> agent -> memory -> governed action -> evidence 
 
 ### Why It Matters
 
-Reliable agents need memory they can navigate, not just context they can
-retrieve.
+Reliable agents need memory they can navigate, not just context they can retrieve.
 
 For real agentic work, it is not enough to ask which text chunk looks similar.
 The system also needs to answer:
@@ -86,8 +87,8 @@ chunks.
 
 | Plane | Repository | Language | What it provides |
 | --- | --- | --- | --- |
-| **Coordination** | [`underpass-choreographer`](https://github.com/underpass-ai/underpass-choreographer) | Rust | Deliberation engine for specialist agent councils: propose → critique → revise → validate → score, LLM-as-judge, declarative YAML ceremonies, debate-as-trace observability; use-case- and provider-agnostic; API-first |
-| **Memory** | [`rehydration-kernel`](https://github.com/underpass-ai/rehydration-kernel) | Rust | Underpass KMP: typed `KernelMemoryService`, deterministic memory retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP adapter, Helm/Kubernetes deployment |
+| **Memory** | [`kmp`](https://github.com/underpass-ai/kmp) | Rust | Underpass KMP: typed `KernelMemoryService`, deterministic memory retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP adapter, Helm/Kubernetes deployment, embedded/local distribution |
+| **Coordination** | [`made`](https://github.com/underpass-ai/made) | Rust | MADE: structured deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch, output contracts, deliberation-native observability; use-case- and provider-agnostic; API-first |
 | **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | Isolated workspaces, governed tools, policy checks, adaptive tool recommendation, telemetry, mTLS, Kubernetes-oriented execution |
 
 The `rehydration-*` names are historical repository and artifact names. The
@@ -97,8 +98,8 @@ public memory product name is **Underpass KMP**.
 
 | Component | Ownership | Examples |
 | --- | --- | --- |
-| **Underpass Choreographer** | Underpass | Council deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch |
-| **Underpass KMP** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model |
+| **Underpass KMP** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
+| **MADE by Underpass** | Underpass | Council deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch |
 | **Underpass Runtime** | Underpass | Governed tools, execution isolation, policy checks |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
 | **Application services** | Product/team using Underpass | payments-api, order-svc, internal platforms |
@@ -136,12 +137,14 @@ forked, which evidence mattered, and why the final resolution worked.
 
 Current focus areas:
 
+- KMP embedded distribution: zero-infrastructure, per-project memory verified
+  in Claude Code and Codex;
+- KMP discovery plugin for memory exploration by agents and humans;
 - stronger MemoryArena, MemoryAgentBench, and LongMemEval evaluations;
 - hybrid retrieval, reranking, and typed domain plugins;
 - visual graph and timeline exploration for traversing agent memory;
 - a small operator model trained to use KMP/MCP tools efficiently;
-- embedded and installable distributions that reduce infrastructure
-  requirements while preserving KMP semantics.
+- MADE ceremony authoring and runtime observability runbooks.
 
 ### Articles
 
@@ -157,12 +160,13 @@ Current focus areas:
 Core infrastructure is deployed and validated on live Kubernetes clusters with
 TLS/mTLS-enabled boundaries. Underpass KMP includes typed gRPC memory APIs,
 temporal traversal, graph tracing, node inspection, scoped multidimensional
-memory, and an MCP adapter over the same public API.
+memory, an MCP adapter over the same public API, and a local/embedded distribution
+verified in Claude Code and Codex.
 
-Underpass Choreographer runs council deliberations and YAML ceremonies
-end-to-end against live vLLM-served models on Kubernetes, with an optional
-LLM judge, the debate exported as OpenTelemetry traces over mTLS, and a
-deliberation-specific Prometheus metrics suite served at `/metrics`.
+MADE runs council deliberations and YAML ceremonies end-to-end against live
+vLLM-served models on Kubernetes, with an optional LLM judge, the debate exported
+as OpenTelemetry traces over mTLS, and a deliberation-specific Prometheus metrics
+suite served at `/metrics`.
 
 The project is active and evolving quickly. Public repositories are released
 under Apache-2.0 unless stated otherwise.
