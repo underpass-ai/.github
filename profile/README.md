@@ -14,20 +14,36 @@ makes them safer, more useful, and easier to inspect in production.
 
 ### What We Build
 
-**Memory plane — Underpass KMP** — [Kernel Memory Protocol](https://github.com/underpass-ai/kmp)
-for temporal, multidimensional, auditable agent memory. Exposes an API-first
-`KernelMemoryService` gRPC boundary for memory ingest, deterministic `Wake`/`Ask`,
-temporal traversal, graph path tracing, and node inspection. Memory is scoped by
-`about`, split into dimensions, connected by explicit relationships, and backed by
-evidence and provenance.
+**Memory plane — [KMP by Underpass](https://github.com/underpass-ai/kmp)**
+gives Codex, Claude Code and Hermes Agent local-first memory. It stores decisions
+and evidence in SQLite, with explicit clocks and relations that preserve what
+changed, why it changed and what proves it. Agents recover scoped context, ask
+for stored evidence, navigate history and audit the original sources. `UNKNOWN`
+is an explicit outcome when the selected memory cannot answer.
 
-KMP ships in two distributions that share the same protocol semantics:
-- **Infrastructure** — typed gRPC server with Neo4j/Valkey/NATS adapters, Helm/Kubernetes
-deployment, full TLS/mTLS and observability. For teams running shared, auditable agent
-memory at scale.
-- **Local / embedded** — the kernel in-process inside an MCP stdio binary: zero
-infrastructure, per-project `.kernel/` memory, fsync-durable, verified live in
-**Claude Code** and **Codex**. Same KMP tools with identical JSON by construction.
+**ChronoLoom** gives the person and the agent a shared view of that memory:
+timelines, about layers, filters and proof paths. The person can take control
+or undo a view move. A progressive guide teaches the agent how to use the live
+MCP tools.
+
+- **Local / embedded — the default.** The kernel runs inside the MCP process,
+  with no database server, KMP account or hosted service required. Multiple local
+  hosts can share SQLite memory. Native plugins support Codex and Claude Code;
+  native setup supports Hermes. Reviewed portable bundles carry project memory
+  between machines.
+- **Shared service — optional and self-operated.** Typed gRPC APIs backed by
+  Neo4j, Valkey and NATS JetStream, with Helm/Kubernetes deployment, TLS/mTLS and
+  observability. Operators own the infrastructure, identity and authorization.
+  Backend-specific capabilities are documented rather than assumed identical.
+
+Default embedded retrieval needs no external model. Optional TypeSafe Jev
+features send selected text to an external service for judgments; an optional
+semantic encoder runs locally. Evidence returned to a cloud agent also follows
+that host's data policy. Your agent writes the final answer from the evidence.
+
+[Install KMP](https://github.com/underpass-ai/kmp#install-and-initialize-your-memory)
+· [Embedded memory](https://github.com/underpass-ai/kmp/blob/main/docs/embedded/README.md)
+· [Explore ChronoLoom](https://github.com/underpass-ai/kmp/tree/main/crates/kmp-viewer)
 
 **Coordination plane — MADE by Underpass** — [Multi-Agent Deliberation Engine](https://github.com/underpass-ai/made)
 runs structured deliberations (propose → peer-critique → revise → validate → score → winner)
@@ -79,7 +95,7 @@ The system also needs to answer:
 - why one answer replaced another;
 - which evidence supports the final result.
 
-Underpass KMP is built around that model: memory as a temporal, inspectable,
+KMP by Underpass is built around that model: memory as a temporal, inspectable,
 multidimensional graph, not just raw transcript replay or vector search over
 chunks.
 
@@ -87,18 +103,18 @@ chunks.
 
 | Plane | Repository | Language | What it provides |
 | --- | --- | --- | --- |
-| **Memory** | [`kmp`](https://github.com/underpass-ai/kmp) | Rust | Underpass KMP: typed `KernelMemoryService`, deterministic memory retrieval, multidimensional memory, temporal traversal, trace/inspect, evidence-backed `Ask`, MCP adapter, Helm/Kubernetes deployment, embedded/local distribution |
+| **Memory** | [`kmp`](https://github.com/underpass-ai/kmp) | Rust | KMP by Underpass: local SQLite memory, decisions and evidence, temporal navigation, auditable relations, shared ChronoLoom view, native agent setup and optional self-operated gRPC service |
 | **Coordination** | [`made`](https://github.com/underpass-ai/made) | Rust | MADE: structured deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch, output contracts, deliberation-native observability; use-case- and provider-agnostic; API-first |
 | **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | Isolated workspaces, governed tools, policy checks, adaptive tool recommendation, telemetry, mTLS, Kubernetes-oriented execution |
 
 The `rehydration-*` names are historical repository and artifact names. The
-public memory product name is **Underpass KMP**.
+public memory product name is **KMP by Underpass**.
 
 ### Architecture: What We Own
 
 | Component | Ownership | Examples |
 | --- | --- | --- |
-| **Underpass KMP** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
+| **KMP by Underpass** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
 | **MADE by Underpass** | Underpass | Council deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch |
 | **Underpass Runtime** | Underpass | Governed tools, execution isolation, policy checks |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
@@ -111,8 +127,8 @@ public memory product name is **Underpass KMP**.
   MCP is an agent-facing adapter over the same memory semantics.
 - **Explicit scope**: memory reads are scoped by current `about`, selected
   abouts, or intentionally global reads.
-- **Temporal traversal**: callers can move through memory with `goto`, `near`,
-  `rewind`, `forward`, `trace`, and `inspect`.
+- **Temporal traversal**: `kmp_time` moves through explicit clocks with `goto`,
+  `near`, `rewind` and `forward`; `kmp_trace` and `kmp_inspect` audit paths and sources.
 - **Evidence and provenance**: recovered memory carries refs, proof, relation
   metadata, and traceability.
 - **Fail-fast behavior**: invalid scopes and unsafe fallbacks are rejected
@@ -135,16 +151,18 @@ measured as Prometheus metrics.
 people and LLMs inspect what happened, what each agent knew, where the process
 forked, which evidence mattered, and why the final resolution worked.
 
-Current focus areas:
+KMP's current public capabilities include:
 
-- KMP embedded distribution: zero-infrastructure, per-project memory verified
-  in Claude Code and Codex;
-- KMP discovery plugin for memory exploration by agents and humans;
-- stronger MemoryArena, MemoryAgentBench, and LongMemEval evaluations;
-- hybrid retrieval, reranking, and typed domain plugins;
-- visual graph and timeline exploration for traversing agent memory;
-- a small operator model trained to use KMP/MCP tools efficiently;
-- MADE ceremony authoring and runtime observability runbooks.
+- local SQLite memory shared by Codex, Claude Code and Hermes Agent;
+- native installation workflows and a progressive guide for agents;
+- anchored Ask with explicit answered, partial and unknown outcomes;
+- a local lexical index for eligible reads, with ordinary retrieval as fallback;
+- optional model-assisted retrieval and source-bound search expansions;
+- ChronoLoom exploration shared between the person and the agent.
+
+See the [KMP changelog](https://github.com/underpass-ai/kmp/blob/main/CHANGELOG.md)
+for released changes and work still marked Unreleased. Retrieval experiments
+carry their own measurements and limits; they are not general accuracy claims.
 
 ### Articles
 
@@ -157,11 +175,11 @@ Current focus areas:
 
 ### Status
 
-Core infrastructure is deployed and validated on live Kubernetes clusters with
-TLS/mTLS-enabled boundaries. Underpass KMP includes typed gRPC memory APIs,
-temporal traversal, graph tracing, node inspection, scoped multidimensional
-memory, an MCP adapter over the same public API, and a local/embedded distribution
-verified in Claude Code and Codex.
+KMP is pre-1.0 and actively evolving. Its default embedded path stores memory
+locally in SQLite and exposes it through MCP, with ChronoLoom for visual
+inspection. The optional remote API is versioned `v1beta1` and requires an
+operator. Installation, backend limits and release status are maintained in the
+[KMP repository](https://github.com/underpass-ai/kmp).
 
 MADE runs council deliberations and YAML ceremonies end-to-end against live
 vLLM-served models on Kubernetes, with an optional LLM judge, the debate exported
