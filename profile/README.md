@@ -4,10 +4,10 @@
 
 Website: [underpassai.com](https://underpassai.com)
 
-Underpass AI builds the infrastructure layer around models: a coordination
-plane that runs auditable deliberations among councils of specialist agents, a
-memory plane that agents can navigate and audit, and an execution plane that
-governs how agents act on real systems.
+Underpass AI builds the infrastructure around models: a memory plane that
+agents can navigate and audit, a coordination plane for durable procedures
+involving agents and people, and an execution plane that governs how agents
+act on real systems.
 
 We do not build foundation models. We build the operational substrate that
 makes them safer, more useful, and easier to inspect in production.
@@ -45,11 +45,36 @@ that host's data policy. Your agent writes the final answer from the evidence.
 · [Embedded memory](https://github.com/underpass-ai/kmp/blob/main/docs/embedded/README.md)
 · [Explore ChronoLoom](https://github.com/underpass-ai/kmp/tree/main/crates/kmp-viewer)
 
-**Coordination plane — MADE by Underpass** — [Multi-Agent Deliberation Engine](https://github.com/underpass-ai/made)
-runs structured deliberations (propose → peer-critique → revise → validate → score → winner)
-and longer declarative YAML ceremonies as explicit state machines. Enforces output contracts,
-can score with an LLM judge, and ships observability that shows *why* an answer won.
-Domain- and provider-agnostic. Kubernetes-first.
+**Coordination plane — [MADE by Underpass](https://github.com/underpass-ai/made)**
+(Multi-Agent Deliberation Engine) coordinates shared procedures: who can act,
+which work is ready, what needs review and when a person must decide. The host
+supplies agents, tools and people. MADE validates their progress and records
+accepted results in an auditable ceremony event stream.
+
+- **Local / embedded — the default.** Plugins for Codex and Claude Code run
+  through MCP and SQLite. Setup configures the store, authorization and a
+  persistent search cursor key. No MADE account, deployed service or Kubernetes
+  is required. Rust applications can embed the same engine. Publish definitions
+  before starting ceremonies that must resume after restart.
+- **Durable work and human review.** YAML ceremonies declare roles, sequential
+  or concurrent steps, human guards, retries and deadlines. Hosts claim work,
+  perform it and return results tied to the accepted claim. Pause/resume and
+  explicit recovery preserve the audit trail; a claimed step alone performs no
+  external work.
+- **Systems and supervision in 0.8.0.** Compose published ceremonies into one
+  system, hand a paused ceremony to an auditable successor, and send questions
+  to working agents with tracked acknowledgements. An integrator host follows
+  results, blockers and human decisions through a durable attention loop.
+  The host still supplies execution; automatic host activation is opt-in.
+- **Shared service — optional and self-operated.** gRPC, PostgreSQL, NATS and
+  Helm/Kubernetes support shared deployments. Configured provider-backed
+  councils can propose, critique, revise, validate and score contributions,
+  with output contracts, an optional LLM judge, metrics and traces.
+
+[Install MADE](https://github.com/underpass-ai/made/blob/main/docs/plugins/README.md)
+· [Manual MCP setup](https://github.com/underpass-ai/made/blob/main/docs/embedded/README.md)
+· [0.8 workflows and limits](https://github.com/underpass-ai/made/blob/main/docs/corte7/README.md)
+· [Rust embedding](https://github.com/underpass-ai/made/blob/main/docs/embedded/rust.md)
 
 **Execution plane — [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime)**
 provides isolated workspaces, governed tool execution, policy checks,
@@ -60,19 +85,19 @@ needs institutional memory plus governed action can be built on top.
 
 ### How It Works
 
-Underpass is designed to run alongside existing infrastructure. Operational
-systems produce domain events. MADE convenes a council of specialist agents that
-investigate real systems, recover relevant memory through KMP, act through governed
-runtime tools, and record evidence back into memory.
+A host can combine the three planes around a task or a domain event. It uses
+MADE to coordinate a procedure, KMP to recover relevant memory, and Runtime to
+perform governed actions. The host supplies these integrations and records the
+evidence; installing one component does not automatically connect the others.
 
 ```text
-Domain event fires
-  -> MADE convenes a specialist agent council
-    -> Agents investigate the real system
-      -> KMP restores scoped memory and navigable timelines
+Task or domain event
+  -> Host starts a published MADE ceremony
+    -> Agents claim work; people decide at human guards
+      -> Host uses KMP to recover scoped memory
         -> Runtime governs tool execution
-          -> Evidence is recorded
-            -> The next similar event starts with better memory
+          -> MADE records accepted results; host preserves evidence in KMP
+            -> The next task starts with that memory
 ```
 
 The common pattern:
@@ -104,7 +129,7 @@ chunks.
 | Plane | Repository | Language | What it provides |
 | --- | --- | --- | --- |
 | **Memory** | [`kmp`](https://github.com/underpass-ai/kmp) | Rust | KMP by Underpass: local SQLite memory, decisions and evidence, temporal navigation, auditable relations, shared ChronoLoom view, native agent setup and optional self-operated gRPC service |
-| **Coordination** | [`made`](https://github.com/underpass-ai/made) | Rust | MADE: structured deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch, output contracts, deliberation-native observability; use-case- and provider-agnostic; API-first |
+| **Coordination** | [`made`](https://github.com/underpass-ai/made) | Rust | MADE: local SQLite ceremonies, durable claims, human review, auditable successors, agent interventions, composed systems and integrator attention; optional shared service and provider-backed councils |
 | **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | Isolated workspaces, governed tools, policy checks, adaptive tool recommendation, telemetry, mTLS, Kubernetes-oriented execution |
 
 The `rehydration-*` names are historical repository and artifact names. The
@@ -115,7 +140,7 @@ public memory product name is **KMP by Underpass**.
 | Component | Ownership | Examples |
 | --- | --- | --- |
 | **KMP by Underpass** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
-| **MADE by Underpass** | Underpass | Council deliberation, YAML ceremonies, LLM-as-judge scoring, event-driven dispatch |
+| **MADE by Underpass** | Underpass | Durable ceremonies, human guards, system composition, delivery and attention protocols, council deliberation |
 | **Underpass Runtime** | Underpass | Governed tools, execution isolation, policy checks |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
 | **Application services** | Product/team using Underpass | payments-api, order-svc, internal platforms |
@@ -140,12 +165,14 @@ public memory product name is **KMP by Underpass**.
 
 ### Currently Building
 
-**Auditable multi-agent deliberation** — ceremonies that turn a meeting of
-specialist agents into a first-class artifact: the winning contribution of
-each step returned over the API, the full debate replayable as a distributed
-trace in Grafana/Tempo, and the health of the decision process — judge
-discrimination, winner-score distribution, provider saturation, token cost —
-measured as Prometheus metrics.
+**Durable coordination for agents and people** — MADE 0.8.0 connects published
+ceremonies, human review and supervised systems. Its successor and intervention
+protocols preserve where work happened and whether a question was acknowledged.
+The integrator loop records intent before effect so a host can recover its
+coordination state after a crash. See the
+[MADE release](https://github.com/underpass-ai/made/releases/tag/v0.8.0) and
+[declared limits](https://github.com/underpass-ai/made/blob/main/docs/corte7/README.md#still-declared-as-limits)
+for the shipped scope.
 
 **Replayable operational memory for AI agents** — a memory layer that lets
 people and LLMs inspect what happened, what each agent knew, where the process
@@ -181,10 +208,12 @@ inspection. The optional remote API is versioned `v1beta1` and requires an
 operator. Installation, backend limits and release status are maintained in the
 [KMP repository](https://github.com/underpass-ai/kmp).
 
-MADE runs council deliberations and YAML ceremonies end-to-end against live
-vLLM-served models on Kubernetes, with an optional LLM judge, the debate exported
-as OpenTelemetry traces over mTLS, and a deliberation-specific Prometheus metrics
-suite served at `/metrics`.
+MADE 0.8.0 is published and pre-1.0. Its default path is a local plugin with
+SQLite; a shared service and provider-backed councils are optional. Check the
+[installation guide](https://github.com/underpass-ai/made/blob/main/docs/plugins/README.md)
+for the release-pinned catalogue: the rolling marketplace can lag the latest
+release. Existing stores and clients should follow the
+[migration guide](https://github.com/underpass-ai/made/blob/main/docs/migrations/README.md).
 
 The project is active and evolving quickly. Public repositories are released
 under Apache-2.0 unless stated otherwise.
