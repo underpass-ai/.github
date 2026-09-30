@@ -12,6 +12,10 @@ act on real systems.
 We do not build foundation models. We build the operational substrate that
 makes them safer, more useful, and easier to inspect in production.
 
+| Memory | Coordination | Execution |
+| :---: | :---: | :---: |
+| [<img src="assets/kmp-wordmark.svg" alt="KMP" width="195">](https://github.com/underpass-ai/kmp) | [<img src="assets/made-wordmark.svg" alt="MADE" width="155">](https://github.com/underpass-ai/made) | [<img src="assets/axlr-wordmark.png" alt="AXLR" width="205">](https://github.com/underpass-ai/AXLR) |
+
 ### What We Build
 
 **Memory plane — [KMP by Underpass](https://github.com/underpass-ai/kmp)**
@@ -76,26 +80,32 @@ accepted results in an auditable ceremony event stream.
 · [0.8 workflows and limits](https://github.com/underpass-ai/made/blob/main/docs/corte7/README.md)
 · [Rust embedding](https://github.com/underpass-ai/made/blob/main/docs/embedded/rust.md)
 
-**Execution plane — [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime)**
-provides isolated workspaces, governed tool execution, policy checks,
-telemetry, and adaptive tool recommendations for tool-driven agents.
+**Execution plane — [AXLR](https://github.com/underpass-ai/AXLR)** runs the
+agent's model turns and local tools in a trusted Linux workspace. Its interactive
+console streams model output and saves sessions. AXLR also offers a Go library
+and a one-request JSON worker for hosts. Tool approvals and an explicit execution
+boundary govern local actions; standard MCP connections and Codex-compatible
+plugin packages connect the memory and coordination engines.
+
+[Explore AXLR](https://github.com/underpass-ai/AXLR)
 
 Together these three planes form **infrastructure, not an application**. Any domain that
 needs institutional memory plus governed action can be built on top.
 
 ### How It Works
 
-A host can combine the three planes around a task or a domain event. It uses
-MADE to coordinate a procedure, KMP to recover relevant memory, and Runtime to
-perform governed actions. The host supplies these integrations and records the
-evidence; installing one component does not automatically connect the others.
+A host can combine the three planes around a task or a domain event. MADE
+coordinates the procedure, KMP recovers relevant memory, and AXLR runs the
+agent's model turns and tools. The host configures the MCP connections and
+records the evidence; installing one component does not automatically connect
+the others.
 
 ```text
 Task or domain event
   -> Host starts a published MADE ceremony
     -> Agents claim work; people decide at human guards
       -> Host uses KMP to recover scoped memory
-        -> Runtime governs tool execution
+        -> AXLR runs agent turns and approved tools
           -> MADE records accepted results; host preserves evidence in KMP
             -> The next task starts with that memory
 ```
@@ -130,7 +140,10 @@ chunks.
 | --- | --- | --- | --- |
 | **Memory** | [`kmp`](https://github.com/underpass-ai/kmp) | Rust | KMP by Underpass: local SQLite memory, decisions and evidence, temporal navigation, auditable relations, shared ChronoLoom view, native agent setup and optional self-operated gRPC service |
 | **Coordination** | [`made`](https://github.com/underpass-ai/made) | Rust | MADE: local SQLite ceremonies, durable claims, human review, auditable successors, agent interventions, composed systems and integrator attention; optional shared service and provider-backed councils |
-| **Execution** | [`underpass-runtime`](https://github.com/underpass-ai/underpass-runtime) | Go | Isolated workspaces, governed tools, policy checks, adaptive tool recommendation, telemetry, mTLS, Kubernetes-oriented execution |
+| **Execution** | [`AXLR`](https://github.com/underpass-ai/AXLR) | Go | Trusted-local agent loop, interactive console, saved sessions, approved tools, MCP and plugins, Go library and JSON worker |
+
+[Underpass Runtime](https://github.com/underpass-ai/underpass-runtime) remains
+available as the historical predecessor to AXLR.
 
 The `rehydration-*` names are historical repository and artifact names. The
 public memory product name is **KMP by Underpass**.
@@ -141,7 +154,7 @@ public memory product name is **KMP by Underpass**.
 | --- | --- | --- |
 | **KMP by Underpass** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
 | **MADE by Underpass** | Underpass | Durable ceremonies, human guards, system composition, delivery and attention protocols, council deliberation |
-| **Underpass Runtime** | Underpass | Governed tools, execution isolation, policy checks |
+| **AXLR** | Underpass | Agent loop, local tool execution, approvals, MCP and plugin integration |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
 | **Application services** | Product/team using Underpass | payments-api, order-svc, internal platforms |
 | **Observability and CI/CD** | Product/team using Underpass | Prometheus, Grafana, PagerDuty, GitHub Actions, ArgoCD |
