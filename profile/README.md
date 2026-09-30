@@ -14,7 +14,7 @@ makes them safer, more useful, and easier to inspect in production.
 
 | Memory | Coordination | Execution |
 | :---: | :---: | :---: |
-| [<img src="assets/kmp-spectrum.svg" alt="KMP" width="195">](https://github.com/underpass-ai/kmp) | [<img src="assets/made-spectrum.svg" alt="MADE" width="155">](https://github.com/underpass-ai/made) | [<img src="assets/axlr-spectrum.png" alt="AXLR" width="205">](https://github.com/underpass-ai/AXLR) |
+| [<img src="assets/kmp-spectrum.svg" alt="KMP" width="195">](https://github.com/underpass-ai/kmp) | [<img src="assets/made-spectrum.svg" alt="MADE" width="155">](https://github.com/underpass-ai/made) | [<img src="assets/axlr-spectrum.svg" alt="AXLR" width="205">](https://github.com/underpass-ai/AXLR) |
 
 ### What We Build
 
@@ -65,7 +65,7 @@ accepted results in an auditable ceremony event stream.
   perform it and return results tied to the accepted claim. Pause/resume and
   explicit recovery preserve the audit trail; a claimed step alone performs no
   external work.
-- **Systems and supervision in 0.8.0.** Compose published ceremonies into one
+- **Systems and supervision.** Compose published ceremonies into one
   system, hand a paused ceremony to an auditable successor, and send questions
   to working agents with tracked acknowledgements. An integrator host follows
   results, blockers and human decisions through a durable attention loop.
@@ -77,7 +77,7 @@ accepted results in an auditable ceremony event stream.
 
 [Install MADE](https://github.com/underpass-ai/made/blob/main/docs/plugins/README.md)
 · [Manual MCP setup](https://github.com/underpass-ai/made/blob/main/docs/embedded/README.md)
-· [0.8 workflows and limits](https://github.com/underpass-ai/made/blob/main/docs/corte7/README.md)
+· [Workflow contracts and limits](https://github.com/underpass-ai/made/blob/main/docs/corte7/README.md)
 · [Rust embedding](https://github.com/underpass-ai/made/blob/main/docs/embedded/rust.md)
 
 **Execution plane — [AXLR](https://github.com/underpass-ai/AXLR)** runs the
@@ -178,12 +178,12 @@ public memory product name is **KMP by Underpass**.
 
 ### Currently Building
 
-**Durable coordination for agents and people** — MADE 0.8.0 connects published
+**Durable coordination for agents and people** — MADE 0.9.1 connects published
 ceremonies, human review and supervised systems. Its successor and intervention
 protocols preserve where work happened and whether a question was acknowledged.
 The integrator loop records intent before effect so a host can recover its
 coordination state after a crash. See the
-[MADE release](https://github.com/underpass-ai/made/releases/tag/v0.8.0) and
+[MADE release](https://github.com/underpass-ai/made/releases/tag/v0.9.1) and
 [declared limits](https://github.com/underpass-ai/made/blob/main/docs/corte7/README.md#still-declared-as-limits)
 for the shipped scope.
 
@@ -221,7 +221,7 @@ inspection. The optional remote API is versioned `v1beta1` and requires an
 operator. Installation, backend limits and release status are maintained in the
 [KMP repository](https://github.com/underpass-ai/kmp).
 
-MADE 0.8.0 is published and pre-1.0. Its default path is a local plugin with
+MADE 0.9.1 is published and pre-1.0. Its default path is a local plugin with
 SQLite; a shared service and provider-backed councils are optional. Check the
 [installation guide](https://github.com/underpass-ai/made/blob/main/docs/plugins/README.md)
 for the release-pinned catalogue: the rolling marketplace can lag the latest
