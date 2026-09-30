@@ -14,7 +14,7 @@ makes them safer, more useful, and easier to inspect in production.
 
 | Memory | Coordination | Execution |
 | :---: | :---: | :---: |
-| [<img src="assets/kmp-wordmark-spectrum.svg" alt="KMP" width="195">](https://github.com/underpass-ai/kmp) | [<img src="assets/made-wordmark.svg" alt="MADE" width="155">](https://github.com/underpass-ai/made) | [<img src="assets/axlr-wordmark.png" alt="AXLR" width="205">](https://github.com/underpass-ai/AXLR) |
+| [<img src="assets/kmp-spectrum.svg" alt="KMP" width="195">](https://github.com/underpass-ai/kmp) | [<img src="assets/made-spectrum.svg" alt="MADE" width="155">](https://github.com/underpass-ai/made) | [<img src="assets/axlr-spectrum.png" alt="AXLR" width="205">](https://github.com/underpass-ai/AXLR) |
 
 ### What We Build
 
@@ -49,7 +49,7 @@ that host's data policy. Your agent writes the final answer from the evidence.
 · [Embedded memory](https://github.com/underpass-ai/kmp/blob/main/docs/embedded/README.md)
 · [Explore ChronoLoom](https://github.com/underpass-ai/kmp/tree/main/crates/kmp-viewer)
 
-**Coordination plane — [MADE by Underpass](https://github.com/underpass-ai/made)**
+**Coordination plane — [MADE](https://github.com/underpass-ai/made)**
 (Multi-Agent Deliberation Engine) coordinates shared procedures: who can act,
 which work is ready, what needs review and when a person must decide. The host
 supplies agents, tools and people. MADE validates their progress and records
@@ -153,7 +153,7 @@ public memory product name is **KMP by Underpass**.
 | Component | Ownership | Examples |
 | --- | --- | --- |
 | **KMP by Underpass** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
-| **MADE by Underpass** | Underpass | Durable ceremonies, human guards, system composition, delivery and attention protocols, council deliberation |
+| **MADE** | Underpass | Durable ceremonies, human guards, system composition, delivery and attention protocols, council deliberation |
 | **AXLR** | Underpass | Agent loop, local tool execution, approvals, MCP and plugin integration |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
 | **Application services** | Product/team using Underpass | payments-api, order-svc, internal platforms |
