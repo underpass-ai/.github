@@ -14,7 +14,7 @@ makes them safer, more useful, and easier to inspect in production.
 
 | Memory | Coordination | Execution |
 | :---: | :---: | :---: |
-| [<img src="assets/kmp-spectrum.svg" alt="KMP" width="195">](https://github.com/underpass-ai/kmp) | [<img src="assets/made-spectrum.svg" alt="MADE" width="155">](https://github.com/underpass-ai/made) | [<img src="assets/axlr-spectrum.svg" alt="AXLR" width="205">](https://github.com/underpass-ai/AXLR) |
+| [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/kmp-emblem-dark.svg"><img src="assets/kmp-emblem-light.svg" alt="KMP" width="165"></picture>](https://github.com/underpass-ai/kmp) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/made-emblem-dark.svg"><img src="assets/made-emblem-light.svg" alt="MADE" width="201"></picture>](https://github.com/underpass-ai/made) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/axlr-emblem-dark.svg"><img src="assets/axlr-emblem-light.svg" alt="AXLR" width="201"></picture>](https://github.com/underpass-ai/AXLR) |
 
 ### What We Build
 
