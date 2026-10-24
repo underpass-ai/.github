@@ -239,8 +239,8 @@ ChronoLoom on it, and `examples/` holds real memories to load and ask about.
 See the [Unreleased changes](https://github.com/underpass-ai/kmp/blob/main/CHANGELOG.md#unreleased).
 
 **MADE** — on `main` and not yet released: a person approves a human guard and
-issues grants from their own terminal, where the agent's session cannot do it
-for them. Tool profiles cut what a host loads, and signed evidence bundles let
+issues grants from their own terminal instead of through the agent's session.
+Tool profiles cut what a host loads, and signed evidence bundles let
 someone without the store verify a ceremony's journal. See the
 [Unreleased changes](https://github.com/underpass-ai/made/blob/main/CHANGELOG.md#unreleased).
 
