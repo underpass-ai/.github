@@ -46,10 +46,6 @@ topics() {
 
 COMMON=(ai-agents agent-infrastructure underpass-ai)
 
-# Organisation
-run gh api --silent -X PATCH "orgs/$ORG" \
-  -f description="Memory, coordination, and execution infrastructure for reliable AI agents. KMP, MADE, AXLR, and AXLR Bots."
-
 # Descriptions and homepages
 run gh repo edit "$ORG/kmp" \
   --description "Local-first agent memory that preserves what happened, when and why"
@@ -72,6 +68,12 @@ topics axlr-bots "${COMMON[@]}" axlr bots control-plane go mtls systemd
 topics axlr-site "${COMMON[@]}" axlr website zola
 topics axlr-registry "${COMMON[@]}" axlr tool-registry rust aws-lambda serverless
 topics plugins "${COMMON[@]}" claude-code codex mcp plugin-marketplace
+
+# Organisation, last: it needs a token with the admin:org scope
+# (gh auth refresh -h github.com -s admin:org), and a refusal here leaves the
+# repository changes above already applied.
+run gh api --silent -X PATCH "orgs/$ORG" \
+  -f description="Memory, coordination, and execution infrastructure for reliable AI agents. KMP, MADE, AXLR, and AXLR Bots."
 
 if [ "$APPLY" -eq 0 ]; then
   echo "Dry run: nothing changed. Run '$0 --apply' to apply."

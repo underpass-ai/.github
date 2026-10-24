@@ -106,7 +106,7 @@ installs tested, pre-forged tools from a signed catalog.
   principal with roles: session client, approver, tool operator or admin. A
   Helm chart deploys it.
 
-[Install AXLR](https://github.com/underpass-ai/AXLR/blob/main/docs/getting-started.md)
+[Install AXLR](https://axlr.underpassai.com/install/)
 · [Runtime contract](https://github.com/underpass-ai/AXLR/blob/main/docs/runtime-contract.md)
 · [axlr.underpassai.com](https://axlr.underpassai.com)
 
