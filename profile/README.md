@@ -98,7 +98,7 @@ plane holds the bots, tasks, executions, nodes and policies and decides when,
 where, as whom and under which permissions a unit of work runs; a node agent
 on each host runs that work with AXLR. A bot has no role baked in: the operator
 writes its mission, tools, autonomy level, triggers, budgets and placement. It
-requires no root and opens nothing on the hosts that run bots: it installs
+requires no root, and the control plane never reaches into a host: it installs
 user-level under systemd, and each node connects outward over mutual TLS after
 enrolling with a one-time token. Every execution runs under a policy outside
 the model, with four autonomy levels from observe to act-within-policy, a
