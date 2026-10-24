@@ -15,7 +15,7 @@ makes them safer, more useful, and easier to inspect in production.
 
 | Memory | Coordination | Execution | Bots |
 | :---: | :---: | :---: | :---: |
-| [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/kmp-emblem-dark.svg"><img src="assets/kmp-emblem-light.svg" alt="KMP" width="165"></picture>](https://github.com/underpass-ai/kmp) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/made-emblem-dark.svg"><img src="assets/made-emblem-light.svg" alt="MADE" width="201"></picture>](https://github.com/underpass-ai/made) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/axlr-emblem-dark.svg"><img src="assets/axlr-emblem-light.svg" alt="AXLR" width="201"></picture>](https://github.com/underpass-ai/AXLR) | [<img src="assets/axlr-bots-emblem-stacked.svg" alt="AXLR Bots" width="150">](https://github.com/underpass-ai/axlr-bots) |
+| [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/kmp-emblem-dark.svg"><img src="assets/kmp-emblem-light.svg" alt="KMP" width="165"></picture>](https://github.com/underpass-ai/kmp) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/made-emblem-dark.svg"><img src="assets/made-emblem-light.svg" alt="MADE" width="201"></picture>](https://github.com/underpass-ai/made) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/axlr-emblem-dark.svg"><img src="assets/axlr-emblem-light.svg" alt="AXLR" width="201"></picture>](https://github.com/underpass-ai/AXLR) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/axlr-bots-emblem-stacked-dark.svg"><img src="assets/axlr-bots-emblem-stacked-light.svg" alt="AXLR Bots" width="150"></picture>](https://github.com/underpass-ai/axlr-bots) |
 
 ### What We Build
 
