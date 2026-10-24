@@ -12,9 +12,9 @@ act on real systems.
 We do not build foundation models. We build the operational substrate that
 makes them safer, more useful, and easier to inspect in production.
 
-| Memory | Coordination | Execution |
-| :---: | :---: | :---: |
-| [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/kmp-emblem-dark.svg"><img src="assets/kmp-emblem-light.svg" alt="KMP" width="165"></picture>](https://github.com/underpass-ai/kmp) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/made-emblem-dark.svg"><img src="assets/made-emblem-light.svg" alt="MADE" width="201"></picture>](https://github.com/underpass-ai/made) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/axlr-emblem-dark.svg"><img src="assets/axlr-emblem-light.svg" alt="AXLR" width="201"></picture>](https://github.com/underpass-ai/AXLR) |
+| Memory | Coordination | Execution | Bots |
+| :---: | :---: | :---: | :---: |
+| [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/kmp-emblem-dark.svg"><img src="assets/kmp-emblem-light.svg" alt="KMP" width="165"></picture>](https://github.com/underpass-ai/kmp) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/made-emblem-dark.svg"><img src="assets/made-emblem-light.svg" alt="MADE" width="201"></picture>](https://github.com/underpass-ai/made) | [<picture><source media="(prefers-color-scheme: dark)" srcset="assets/axlr-emblem-dark.svg"><img src="assets/axlr-emblem-light.svg" alt="AXLR" width="201"></picture>](https://github.com/underpass-ai/AXLR) | [<img src="assets/axlr-bots-emblem.svg" alt="AXLR Bots" width="318">](https://github.com/underpass-ai/axlr-bots) |
 
 ### What We Build
 
@@ -92,6 +92,21 @@ plugin packages connect the memory and coordination engines.
 Together these three planes form **infrastructure, not an application**. Any domain that
 needs institutional memory plus governed action can be built on top.
 
+**Bots — [AXLR Bots](https://github.com/underpass-ai/axlr-bots)** runs
+persistent, governed bots as infrastructure on your own hosts. One control
+plane holds the bots, tasks, executions, nodes and policies and decides when,
+where, as whom and under which permissions a unit of work runs; a node agent
+on each host runs that work with AXLR. A bot has no role baked in: the operator
+writes its mission, tools, autonomy level, triggers, budgets and placement. It
+requires no root and opens nothing on the hosts that run bots: it installs
+user-level under systemd, and each node connects outward over mutual TLS after
+enrolling with a one-time token. Every execution runs under a policy outside
+the model, with four autonomy levels from observe to act-within-policy, a
+budget and correlation ids; tasks arrive by hand, from a webhook or on a timer,
+and a redelivered event creates no second task.
+
+[Explore AXLR Bots](https://github.com/underpass-ai/axlr-bots)
+
 ### How It Works
 
 A host can combine the three planes around a task or a domain event. MADE
@@ -114,6 +129,12 @@ The common pattern:
 
 ```text
 domain event -> orchestration -> agent -> memory -> governed action -> evidence -> better memory
+```
+
+With AXLR Bots, a bot reacts to an event as a service on its own host:
+
+```text
+webhook or timer -> control plane creates the task once -> node agent runs it with AXLR under the bot's policy -> report and events with correlation ids
 ```
 
 ### Why It Matters
@@ -141,6 +162,7 @@ chunks.
 | **Memory** | [`kmp`](https://github.com/underpass-ai/kmp) | Rust | KMP by Underpass: local SQLite memory, decisions and evidence, temporal navigation, auditable relations, shared ChronoLoom view, native agent setup and optional self-operated gRPC service |
 | **Coordination** | [`made`](https://github.com/underpass-ai/made) | Rust | MADE: local SQLite ceremonies, durable claims, human review, auditable successors, agent interventions, composed systems and integrator attention; optional shared service and provider-backed councils |
 | **Execution** | [`AXLR`](https://github.com/underpass-ai/AXLR) | Go | Trusted-local agent loop, interactive console, saved sessions, approved tools, MCP and plugins, Go library and JSON worker |
+| **Bots** | [`axlr-bots`](https://github.com/underpass-ai/axlr-bots) | Go | AXLR Bots: control plane, node agents on your hosts, mTLS enrollment with one-time tokens, policies and budgets per execution, manual, webhook and timer triggers, operator API |
 
 [Underpass Runtime](https://github.com/underpass-ai/underpass-runtime) remains
 available as the historical predecessor to AXLR.
@@ -155,6 +177,7 @@ public memory product name is **KMP by Underpass**.
 | **KMP by Underpass** | Underpass | Memory protocol, temporal traversal, graph inspection, evidence model, embedded distribution |
 | **MADE** | Underpass | Durable ceremonies, human guards, system composition, delivery and attention protocols, council deliberation |
 | **AXLR** | Underpass | Agent loop, local tool execution, approvals, MCP and plugin integration |
+| **AXLR Bots** | Underpass | Bot control plane, node agents and node protocol, enrollment and revocation, per-execution policy and budget, triggers, operator API |
 | **Integration adapter** | Product/team using Underpass | Alert relay, CI/CD hooks, ERP connectors, domain event emitters |
 | **Application services** | Product/team using Underpass | payments-api, order-svc, internal platforms |
 | **Observability and CI/CD** | Product/team using Underpass | Prometheus, Grafana, PagerDuty, GitHub Actions, ArgoCD |
